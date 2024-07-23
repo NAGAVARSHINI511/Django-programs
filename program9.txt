@@ -36,40 +36,15 @@ def generatePDF(request):
 
 
 urls.py:
-import csv
-from django.http import HttpResponse
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table
-from .models import course
+from django.urls import path
+from studCourseRegApp.views import generateCSV, generatePDF
 
-def generateCSV(request):
-    courses = course.objects.all()
-    response = HttpResponse(content_type="text/csv")
-    response['Content-Disposition'] = 'attachment; filename=course_data.csv'
-    
-    writer = csv.writer(response)
-    writer.writerow(['Course Code', 'Course Name', 'Course Credits'])
-    
-    for c in courses:
-        writer.writerow([c.courseCode, c.courseName, c.courseCredits])
-    
-    return response
+urlpatterns = [
+    # other paths
+    path('download_course_table_as_csv/', generateCSV, name='download_course_csv'),
+    path('download_course_table_as_pdf/', generatePDF, name='download_course_pdf'),
+]
 
-def generatePDF(request):
-    courses = course.objects.all()
-    response = HttpResponse(content_type="application/pdf")
-    response['Content-Disposition'] = 'attachment; filename=course_data.pdf'
-    
-    pdf = SimpleDocTemplate(response, pagesize=letter)
-    table_data = [['Course Code', 'Course Name', 'Course Credits']]
-    
-    for c in courses:
-        table_data.append([c.courseCode, c.courseName, str(c.courseCredits)])
-    
-    table = Table(table_data)
-    pdf.build([table])
-    
-    return response
 
 
 templateslink:
