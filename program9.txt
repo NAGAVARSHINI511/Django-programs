@@ -1,0 +1,77 @@
+views.py:
+import csv
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table
+from .models import course
+
+def generateCSV(request):
+    courses = course.objects.all()
+    response = HttpResponse(content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename=course_data.csv'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Course Code', 'Course Name', 'Course Credits'])
+    
+    for c in courses:
+        writer.writerow([c.courseCode, c.courseName, c.courseCredits])
+    
+    return response
+
+def generatePDF(request):
+    courses = course.objects.all()
+    response = HttpResponse(content_type="application/pdf")
+    response['Content-Disposition'] = 'attachment; filename=course_data.pdf'
+    
+    pdf = SimpleDocTemplate(response, pagesize=letter)
+    table_data = [['Course Code', 'Course Name', 'Course Credits']]
+    
+    for c in courses:
+        table_data.append([c.courseCode, c.courseName, str(c.courseCredits)])
+    
+    table = Table(table_data)
+    pdf.build([table])
+    
+    return response
+
+
+urls.py:
+import csv
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table
+from .models import course
+
+def generateCSV(request):
+    courses = course.objects.all()
+    response = HttpResponse(content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename=course_data.csv'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Course Code', 'Course Name', 'Course Credits'])
+    
+    for c in courses:
+        writer.writerow([c.courseCode, c.courseName, c.courseCredits])
+    
+    return response
+
+def generatePDF(request):
+    courses = course.objects.all()
+    response = HttpResponse(content_type="application/pdf")
+    response['Content-Disposition'] = 'attachment; filename=course_data.pdf'
+    
+    pdf = SimpleDocTemplate(response, pagesize=letter)
+    table_data = [['Course Code', 'Course Name', 'Course Credits']]
+    
+    for c in courses:
+        table_data.append([c.courseCode, c.courseName, str(c.courseCredits)])
+    
+    table = Table(table_data)
+    pdf.build([table])
+    
+    return response
+
+
+templateslink:
+<li><a href="{% url 'download_course_csv' %}">DOWNLOAD COURSE AS CSV</a></li>
+<li><a href="{% url 'download_course_pdf' %}">DOWNLOAD COURSE AS PDF</a></li>
