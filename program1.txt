@@ -1,0 +1,17 @@
+#Modify `myapp/views.py`:
+from django.http import HttpResponse
+import datetime
+def current_datetime(request):
+  now = datetime.datetime.now( )
+  html =&quot;&lt;html&gt;&lt;body&gt;It is now %s.&lt;/body&gt;&lt;/html&gt;&quot; % now
+  return HttpResponse(html)
+
+#Create a URL pattern in `myproject/urls.py`:
+#Make sure to import the view function:
+
+from django.urls import path
+from myapp.views import current_datetime
+
+urlpatterns = [
+  path(&#39;time/&#39;, current_datetime),
+]
