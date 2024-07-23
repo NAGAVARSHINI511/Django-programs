@@ -1,0 +1,61 @@
+views.py:
+from django.views import generic
+from .models import student
+
+class StudentListView(generic.ListView):
+    model = student
+    template_name = "GenericListViewStudent.html"
+    context_object_name = 'student_list'  # This makes 'student_list' available in the template
+
+class StudentDetailView(generic.DetailView):
+    model = student
+    template_name = "GenericDetailedViewStudent.html"
+    context_object_name = 'student'  # This makes 'student' available in the template
+
+urls.py:
+from django.urls import path
+from myapp.views import StudentListView, StudentDetailView
+
+urlpatterns = [
+    path('genericlistviewstudent/', StudentListView.as_view(), name='student_list_view'),
+    path('genericdetailedviewstudent/<int:pk>/', StudentDetailView.as_view(), name='student_detail_view'),
+]
+
+
+genricstudentlistview.html:
+{% extends 'basicTemplate.html' %}
+{% block title %} Generic Student List View {% endblock %}
+{% block content %}
+{% if student_list %}
+<table border="1">
+    <tr>
+        <th>USN</th>
+        <th>Courses Enrolled</th>
+    </tr>
+    {% for student in student_list %}
+    <tr>
+        <td>
+            <a href="{% url 'student_detail_view' student.pk %}">{{ student.usn }}</a>
+        </td>
+        <td>
+            {% for course in student.courses.all %}
+                <span>{{ course.courseName }}</span>
+            {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <h1>No Students Enrolled</h1>
+{% endif %}
+{% endblock %}
+
+
+gernricdetailedstudentview.html:
+{% extends 'basicTemplate.html' %}
+{% block title %} Detailed Student View {% endblock %}
+{% block content %}
+<h1> Student Name: {{ student.name }}</h1>
+<h1> Student USN: {{ student.usn }}</h1>
+<h1> Student Sem: {{ student.sem }}</h1>
+{% endblock %}
