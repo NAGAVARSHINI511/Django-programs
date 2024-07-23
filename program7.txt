@@ -1,0 +1,85 @@
+models.py:
+from django.db import models
+
+class Project(models.Model):
+    TOPIC_CHOICES = [
+        ('AI', 'Artificial Intelligence'), 
+        ('WD', 'Web Development'), 
+        ('DS', 'Data Science'), 
+        ('ML', 'Machine Learning'),
+        # Add more choices as needed
+    ]
+    student = models.CharField(max_length=100)  # Change to appropriate student model field if needed
+    topic = models.CharField(max_length=255, choices=TOPIC_CHOICES)
+    languages = models.CharField(max_length=255)  # Comma separated list or consider ManyToManyField
+    duration = models.IntegerField(help_text="Duration in weeks")
+
+    def __str__(self):
+        return self.topic
+
+urls.py:
+from django.contrib import admin
+from django.urls import path
+from myapp.views import create_project, success_page
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('create/', create_project, name='create_project'),
+    path('success/', success_page, name='success_page'),
+]
+
+forms.py:
+from django import forms
+from .models import Project
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ['student', 'topic', 'languages', 'duration']
+
+views.py:
+from django.shortcuts import render, redirect
+from .forms import ProjectForm
+
+def create_project(request):
+    if request.method == 'POST':
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('success_page')  # Replace with your success URL
+    else:
+        form = ProjectForm()
+    return render(request, 'project_form.html', {'form': form})
+
+def success_page(request):
+    return render(request, 'success_page.html')
+
+
+sucesspage.html:
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Project Form</title>
+</head>
+<body>
+    <h2>Your Project is Created Successfully</h2>
+</body>
+</html>
+
+projectform.html:
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Project Registration Form</title>
+</head>
+<body>
+    <h2>Project Form</h2>
+    <form method="POST" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
